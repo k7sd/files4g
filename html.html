@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dark Space</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <input type="file" id="folderInput" multiple webkitdirectory directory>
+  <button onclick="checkFolderSize()">تحقق من حجم المجلد</button>
+  <button onclick="refreshData()">إعادة بناء البيانات</button>
+  <table id="oversizedFilesTable">
+    <caption>الملفات التي تتجاوز 4 جيجابايت</caption>
+    <thead>
+      <tr>
+        <th>اسم الملف</th>
+        <th>مسار الملف</th>
+      </tr>
+    </thead>
+    <tbody id="oversizedFilesList"></tbody>
+  </table>
+
+  <script>
+    var files = [];
+
+    function checkFolderSize() {
+      var folderInput = document.getElementById('folderInput');
+      files = folderInput.files;
+      var maxSizeInBytes = 4 * 1024 * 1024 * 1024; // 4GB
+      var maxSizeInBytesReadable = maxSizeInBytes.toLocaleString() + ' bytes';
+
+      var oversizedFiles = [];
+
+      function processFiles() {
+        var pendingFiles = files.length;
+
+        function checkNextFile() {
+          pendingFiles--;
+          if (pendingFiles === 0) {
+            processOversizedFiles();
+          }
+        }
+
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          if (file.size > maxSizeInBytes) {
+            oversizedFiles.push({ name: file.name, path: file.webkitRelativePath });
+          }
+          checkNextFile();
+        }
+      }
+
+      function processOversizedFiles() {
+        if (oversizedFiles.length > 0) {
+          var tableBody = document.getElementById('oversizedFilesList');
+          tableBody.innerHTML = '';
+
+          for (var j = 0; j < oversizedFiles.length; j++) {
+            var fileItem = oversizedFiles[j];
+            var row = tableBody.insertRow();
+            var nameCell = row.insertCell(0);
+            var pathCell = row.insertCell(1);
+            nameCell.innerHTML = fileItem.name;
+            pathCell.innerHTML = fileItem.path;
+          }
+
+          alert('تم العثور على ' + oversizedFiles.length + ' ملفات تتجاوز حجم الـ ' + maxSizeInBytesReadable);
+        } else {
+          alert('جميع الملفات صالحة');
+        }
+      }
+
+      processFiles();
+    }
+
+    function refreshData() {
+      var tableBody = document.getElementById('oversizedFilesList');
+      tableBody.innerHTML = '';
+
+      var folderInput = document.getElementById('folderInput');
+      folderInput.value = '';
+
+      alert('تمت إعادة بناء البيانات');
+    }
+  </script>
+<br>
+
+<br>
+<br>
+صنع من قبل دارك سبيس
+<br>
+<a href="https://discord.gg/NDUsJU4gKE" target="_blank" rel="noopener noreferrer">Discord</a>
+</body>
+</html>
